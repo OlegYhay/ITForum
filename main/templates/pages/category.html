@@ -1,0 +1,33 @@
+{% extends 'pages/_base.html' %}
+{% block content %}
+<h5 class="headerss">{{category}}</h5>
+<div class="row">
+    <div class="col">
+        <div class="table-responsive headerss">
+            <table class="table table-hover table-striped table-bordered">
+                <thead class="table-secondary">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Вопрос</th>
+                    <th scope="col">Дата создания</th>
+                    <th scope="col">Последнее сообщение</th>
+                    <th scope="col">Ответов</th>
+                </tr>
+                </thead>
+                <tbody class="table-striped">
+                {% for topic in topicss %}
+                <tr>
+                    <th></th>
+                    <td>{{topic.name}}<br/>{{topic.Description|truncatechars:50}}</td>
+                    <td>{{topic.DateOfCreation}}</td>
+                    <td>{{topic.lastmessage}}</td>
+                    <td>{{topic.messagees.count}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

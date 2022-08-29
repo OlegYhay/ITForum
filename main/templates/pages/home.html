@@ -1,30 +1,28 @@
 {% extends 'pages/_base.html' %}
 {% block content %}
-<h4 class="headerss">Компьютерный форум</h4>
-<div class="table-responsive headerss" >
-<table class="table">
-  <thead class="table-secondary">
-    <tr>
-      <th scope="col">Категория</th>
-      <th scope="col">Топиков</th>
-      <th scope="col">Последний топик</th>
-      <th scope="col">Сообщений</th>
-    </tr>
-  </thead>
-  <tbody class="table-striped table-hover">
-    {% for category in categories %}
-    <tr>
-      <th><img class='folder' src="static/img/folder.png" width="35px">{{category.name}}</th>
-      <td>{{category.topics.count}}</td>
-      {% if category.lastpub == None %}
-      <td>-</td>
-      {% else %}
-      <td>{{category.lastpub}}</td>
-      {% endif %}
-      <td>{{category.count_message}}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-</div>
+  <div class="row">
+{% for forum in forums %}
+    <div class="col-6">
+  <div class="table-responsive headerss" >
+  <h4 class="headerss">{{forum.name}}</h4>
+  <table class="table table-hover table-striped table-bordered">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">Категория</th>
+        <th scope="col">Топиков</th>
+      </tr>
+    </thead>
+    <tbody class="table-striped">
+      {% for category in forum.categories.all %}
+      <tr>
+        <th><img class='folder' src="static/img/folder.png" width="35px"><a href="{% url 'category' category.id %}">{{category.name}}</a></th>
+        <td>{{category.topics.count}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  </div>
+{% endfor %}
+  </div>
 {% endblock content %}

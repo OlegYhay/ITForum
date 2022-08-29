@@ -24,4 +24,6 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('', Home.as_view(), name='home'),
                   path('accounts/', include('allauth.urls')),
+                  path('', include('forumBase.urls')),
+
               ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
