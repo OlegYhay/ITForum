@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends 'pages/_base.html' %}
+{% block content %}
+<h4 class="headerss">Компьютерный форум</h4>
+<div class="table-responsive headerss" >
+<table class="table">
+  <thead class="table-secondary">
+    <tr>
+      <th scope="col">Категория</th>
+      <th scope="col">Топиков</th>
+      <th scope="col">Последний топик</th>
+      <th scope="col">Сообщений</th>
+    </tr>
+  </thead>
+  <tbody class="table-striped table-hover">
+    {% for category in categories %}
+    <tr>
+      <th><img class='folder' src="static/img/folder.png" width="35px">{{category.name}}</th>
+      <td>{{category.topics.count}}</td>
+      {% if category.lastpub == None %}
+      <td>-</td>
+      {% else %}
+      <td>{{category.lastpub}}</td>
+      {% endif %}
+      <td>{{category.count_message}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock content %}

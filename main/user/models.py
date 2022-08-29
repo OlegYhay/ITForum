@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 
 class CustomUser(AbstractUser):
-    username = None
     email = models.EmailField(verbose_name='email address', unique=True)
     img = models.ImageField(upload_to='userImg/')
     USERNAME_FIELD = 'email'
