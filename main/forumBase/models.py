@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -23,6 +25,7 @@ class Forum(models.Model):
 
 
 class Topic(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     choice = [
         ('Открыта', 1),
         ('Закрыта', 2),
@@ -39,16 +42,16 @@ class Topic(models.Model):
     status = models.CharField(max_length=20, choices=choice, null=False, default=1)
 
 
-class Meta:
-    ordering = ['DateOfCreation']
+    class Meta:
+        ordering = ['DateOfCreation']
 
 
-def __str__(self):
-    return f'{self.name} - {self.Creator} - {self.DateOfCreation}'
+    def __str__(self):
+        return f'{self.name} - {self.Creator} - {self.DateOfCreation}'
 
 
-def get_absolute_url(self):
-    return reverse('category', kwargs={'pl': self.pk, })
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'pl': self.pk, })
 
 
 class TopicRaiting(models.Model):
@@ -66,18 +69,21 @@ class TopicRaiting(models.Model):
 
 class TopicSubscribe(models.Model):
     Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False)
-    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False)
+    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False,related_name='topics')
 
 
 class CommentTopic(models.Model):
     Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False, verbose_name='Тема',
                               related_name='messagees')
-    User = models.ForeignKey(get_user_model(), on_delete=models.SET_DEFAULT, default='profile delete')
+    User = models.ForeignKey(get_user_model(), on_delete=models.SET_DEFAULT, default='profile delete',related_name='comments')
     CommentText = models.TextField(verbose_name='Комментарий')
     CommentFather = models.ForeignKey('CommentTopic', on_delete=models.CASCADE, null=True, blank=True)
     DateOfComment = models.DateTimeField(auto_now_add=True)
     CommentLike = models.PositiveIntegerField(default=0)
     CommentDislike = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['DateOfComment']
 
     def __str__(self):
         return f'{self.CommentText}'

@@ -1,6 +1,17 @@
 {% extends 'pages/_base.html' %}
 {% block content %}
 <h5 class="headerss">{{category}}</h5>
+<nav class='headerss' aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item active" aria-current="page" href="{% url 'category' category.id %}">{{category}}</li>
+  </ol>
+</nav>
+<a class='btn btn-primary  headerss' href="{% url 'createtopic' category.id %}">Создать обсуждение</a>
+<p></p>
+{% if topicss == 'Error' %}
+<h4 class ="headerss">В данной категории еще нет вопросов.</h4>
+{% else %}
 <div class="row">
     <div class="col">
         <div class="table-responsive headerss">
@@ -15,19 +26,66 @@
                 </tr>
                 </thead>
                 <tbody class="table-striped">
+
                 {% for topic in topicss %}
-                <tr>
-                    <th></th>
-                    <td>{{topic.name}}<br/>{{topic.Description|truncatechars:50}}</td>
-                    <td>{{topic.DateOfCreation}}</td>
-                    <td>{{topic.lastmessage}}</td>
-                    <td>{{topic.messagees.count}}</td>
+                  <tr>
+                    <th class="col">
+<!--                        {% if topic.status == "Закрыта" %}-->
+<!--                        <img  src="/static/img/closed.png" width="75px">-->
+<!--                        {% elif topic.status == 'Открыта'%}-->
+<!--                        <img  src="/static/img/2.webp" width="80px">-->
+<!--                        {% elif topic.status == 'Решена'%}-->
+<!--                        <img  src="/static/img/success.png" width="60px">-->
+<!--                      {% endif %}-->
+                      </th>
+                    <td class="col-7"><a href="{% url 'topic' category.id topic.pk %}">{{topic.name}}</a><br/>{{topic.Description|truncatechars:50}}...</td>
+                    <td class="col-2">{{topic.DateOfCreation}}</td>
+                    {% if topic.lastmessage != None %}
+                    <td class="col-2">{{topic.lastmessage}}</td>
+                    {% else %}
+                    <td class ="col-2">-</td>
+                    {% endif %}
+                    <td class="col-2">{{topic.messagees.count}}</td>
                 </tr>
-                {% endfor %}
+                     {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
     </div>
+</div>
+
+
+<div class="pagination">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.number == 1 %}
+        <li class="page-item disabled"><a class = 'page-link' href="?page=1"><<</a></li>
+        {% else %}
+        <li class="page-item"><a class = 'page-link' href="?page=1"><<</a></li>
+        {% endif %}
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class = 'page-link' href="?page={{ page_obj.previous_page_number}}"><</a></li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1"><</a>
+          </li>
+        {% endif %}
+        <span class="current">
+             <li class="page-item"><a class="page-link">{{page_obj.number }}</a></li>
+        </span>
+        {% if page_obj.has_next %}
+        <li class="page-item"> <a class = 'page-link' href="?page={{ page_obj.next_page_number }}"> > </a></li>
+        {% else %}
+           <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">>  </a>
+          </li>
+        {% endif %}
+        {% if page_obj.paginator.num_pages != page_obj.number %}
+            <li class="page-item"><a class = 'page-link' href="?page={{page_obj.paginator.num_pages}}">>></a></li>
+        {% else %}
+             <li class="page-item disabled"><a class = 'page-link' href="?page={{page_obj.paginator.num_pages}}">>></a></li>
+        {% endif %}
+    </ul>
 </div>
 
 {% endblock content %}

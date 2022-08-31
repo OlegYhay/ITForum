@@ -1,0 +1,106 @@
+{% extends 'pages/_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<nav class='headerss' aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'category' category.id  %}">{{category}}</a></li>
+        <li class="breadcrumb-item active" aria-current="page" href="#">{{topic.name}}</li>
+    </ol>
+</nav>
+
+
+
+<table class="table table-hover table-striped table-bordered headerss">
+    <thead class="table-secondary">
+    <tr>
+        <th scope="col"></th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody class="table-striped">
+    <tr>
+        <td class="col-2 small">
+            <a href="#">{{topic.Creator.username}}</a><br/>
+            <img src="{{topic.Creator.img.url}}" width="40%" min-width="50px" ,min-height="50px"/>
+            <p class="small2">{{topic.Creator.registration_date|date:'Y-m-d'}}</p>
+            <p class="small2">Вопросов:{{topic.Creator.user_topics.count}}</p>
+        </td>
+        <td class="col-9">
+            <h5 class="text-primary">{{topic.name}}</h5>
+            <p class="small">{{topic.DateOfCreation}} <strong>Ответов:{{topic.messagees.count}}</strong></p>
+            <hr>
+            <p class="small">{{topic.Description}}</p>
+        </td>
+    </tr>
+
+
+
+    {% for comment in topic.messagees.all %}
+    <tr>
+        <td class="col-2 small">
+            <a href="#">{{comment.User.username}}</a><br/>
+            {% if comment.User.img  %}
+                <img src="{{comment.User.img.url}}" width="40%" min-width="50px" ,min-height="50px"/>
+            {% endif %}
+            <p class="small2">{{comment.User.registration_date|date:'Y-m-d'}}</p>
+            <p class="small2">Вопросов:{{ comment.User.user_topics.count }}</p>
+        </td>
+        <td class="col-9">
+            {% if comment.CommentFather != None %}
+            <div class="border border-secondary headerss">
+                <br/>
+                <strong class="small headerss">Сообщение от {{comment.CommentFather.User.username}}:</strong>
+                <p class="small headerss">{{comment.CommentFather.CommentText|truncatechars:150}}</p>
+            </div>
+            <br>
+            {% endif %}
+            <p class="small">{{comment.CommentText}}</p>
+            <hr>
+            <p class="small">{{comment.DateOfComment}}</p>
+
+            <!-- Модальное окно -->
+                            <form class="px-4 py-3" method="post" height="20px">
+                                {% csrf_token %}
+                                <div class="card-footer py-3 border-0" style="background-color: #f8f9fa;" height="20px">
+                                    <div class="d-flex flex-start w-100" height="20px">
+                                        <div class="form-outline w-100 " height="50px">
+                                            {{ comment_form|crispy }}
+                                        </div>
+                                    </div>
+                                    <div class="float-end mt-2 pt-1" height="20px">
+                                        <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+                                        <button type="submit" class="btn btn-primary btn-sm">Оставить комментарий
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+{% if user.is_authenticated %}
+<form method="post">
+    {% csrf_token %}
+    <div class="card-footer py-3 border-0" style="background-color: #f8f9fa;">
+        <div class="d-flex flex-start w-100">
+            <div class="form-outline w-100">
+                {{ comment_form|crispy }}
+            </div>
+        </div>
+        <div class="float-end mt-2 pt-1">
+            <button type="submit" class="btn btn-primary btn-sm">Оставить комментарий</button>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+{% endblock content %}

@@ -1,12 +1,12 @@
 {% extends 'pages/_base.html' %}
-{% block title %}Вход {% endblock title %}
+{% block title %}Выход{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h2>Вход</h2>
-<form method="post">
+<h3 class="headerss">Вы действительно хотите выйти?</h3>
+<form method="post" class="headerss">
     {% csrf_token %}
     {{ form|crispy }}
-    <button type="submit" class="btn btn-dark">Войти</button>
+    <button type="submit" class="btn btn-dark">Выйти</button>
     <button type="button" class="btn btn-dark text-light"><a class="text-light"  style="text-decoration: none; " href="{% url 'home' %}">Отмена</a></button>
 </form>
 

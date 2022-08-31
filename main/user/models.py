@@ -14,10 +14,11 @@ if TYPE_CHECKING:
 class CustomUser(AbstractUser):
     email = models.EmailField(verbose_name='email address', unique=True)
     img = models.ImageField(upload_to='userImg/')
+    registration_date = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserModel()
-    friends = models.ManyToManyField('self')
+    friends = models.ManyToManyField('self', blank=True)
 
     def __str__(self):
         return self.email
