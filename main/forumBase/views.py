@@ -1,3 +1,6 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Max, Subquery
 from django.shortcuts import render, redirect
 import datetime
@@ -5,8 +8,8 @@ import datetime
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 
-from forumBase.forms import ModelComment
-from forumBase.models import Category, Forum, Topic, CommentTopic
+from forumBase.forms import ModelComment, ModelRating, ModelLikeDislike
+from forumBase.models import Category, Forum, Topic, CommentTopic, TopicRaiting
 
 
 class Home(ListView):
@@ -44,40 +47,58 @@ class TopicDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(TopicDetail, self).get_context_data(**kwargs)
-        context['category'] = Category.objects.get(pk=self.kwargs['group'])
         if self.request.user.is_authenticated:
             context['comment_form'] = ModelComment(instance=self.request.user)
+            context['rating_form'] = ModelRating(instance=self.request.user)
+            context['like_form'] = ModelLikeDislike(instance=self.request.user)
+            rait = TopicRaiting.objects.filter(User=self.request.user, Topic=self.get_object())
+            if rait.count() == 0:
+                context['rait'] = True
+            else:
+                context['rait'] = False
         return context
 
     def post(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            try:
-                Father = CommentTopic.objects.get(pk=self.request.POST.get('parent_id'))
-                new_comment = CommentTopic(
-                    Topic=self.get_object(),
-                    User=self.request.user,
-                    CommentText=request.POST.get('CommentText'),
-                    DateOfComment=datetime.datetime.now(),
-                    CommentLike=0,
-                    CommentFather=Father,
-                    CommentDislike=0,
-                )
+            # create new comment
+            if self.request.POST.get('form') == 'comment':
+                try:
+                    Father = CommentTopic.objects.get(pk=self.request.POST.get('parent_id'))
+                    new_comment = CommentTopic(
+                        Topic=self.get_object(),
+                        User=self.request.user,
+                        CommentText=request.POST.get('CommentText'),
+                        DateOfComment=datetime.datetime.now(),
+                        CommentLike=0,
+                        CommentFather=Father,
+                        CommentDislike=0,
+                    )
+                    new_comment.save()
+                except:
+                    Father = ''
+                    new_comment = CommentTopic(
+                        Topic=self.get_object(),
+                        User=self.request.user,
+                        CommentText=request.POST.get('CommentText'),
+                        DateOfComment=datetime.datetime.now(),
+                        CommentLike=0,
+                        CommentDislike=0,
+                    )
                 new_comment.save()
-            except:
-                Father = ''
-                new_comment = CommentTopic(
-                    Topic=self.get_object(),
-                    User=self.request.user,
-                    CommentText=request.POST.get('CommentText'),
-                    DateOfComment=datetime.datetime.now(),
-                    CommentLike=0,
-                    CommentDislike=0,
-                )
-            new_comment.save()
+                return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'),
+                                error_rait=False)
+            # create new rating form
+
+            new_TopicRaiting = TopicRaiting.objects.create(
+                User=self.request.user,
+                Topic=self.get_object(),
+                Grade=self.request.POST.get('Grade'),
+            )
+            new_TopicRaiting.save()
             return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
-class CreateTopicView(CreateView):
+class CreateTopicView(LoginRequiredMixin, CreateView):
     model = Topic
     template_name = 'pages/create_topic.html'
     fields = ['name', 'Description']
@@ -90,3 +111,7 @@ class CreateTopicView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('topic', kwargs={'group': self.kwargs['group'], 'pk': self.object.pk})
+
+
+class RulesTempalateView(TemplateView):
+    template_name = 'pages/SiteRules.html'

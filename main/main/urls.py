@@ -17,13 +17,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from forumBase.views import Home
+from forumBase.views import Home, RulesTempalateView
 from .settings import MEDIA_URL, MEDIA_ROOT
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('', Home.as_view(), name='home'),
                   path('accounts/', include('allauth.urls')),
+                  path('', Home.as_view(), name='home'),
                   path('', include('forumBase.urls')),
+                  path('', include('user.urls')),
+                  path('news/', RulesTempalateView.as_view(), name='rules')
 
               ] + static(MEDIA_URL, document_root=MEDIA_ROOT)

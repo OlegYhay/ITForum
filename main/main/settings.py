@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # locals
     'forumBase',
     'user',
+    'apiv1',
 ]
 
 SITE_ID = 1

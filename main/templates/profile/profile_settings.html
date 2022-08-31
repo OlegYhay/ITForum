@@ -1,0 +1,18 @@
+{% extends 'pages/_base.html' %}
+{% block title %}Настройки профиля{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h2 class="headerss">Настройки профиля</h2>
+<form method="post" class="headerss">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <br/>
+    <a href="{% url 'account_change_password' %}" class="btn btn-secondary">Сменить пароль</a>
+        <a href="{% url 'account_email' %}" class="btn btn-secondary">Изменить email</a>
+        <br/>
+    <br/>
+    <button type="submit" class="btn btn-dark">Сохранить</button>
+    <button type="button" class="btn btn-dark text-light"><a class="text-light"  style="text-decoration: none; " href="{% url 'home' %}">Отмена</a></button>
+</form>
+
+{% endblock content %}

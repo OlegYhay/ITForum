@@ -2,16 +2,34 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+<div class="row">
+    <div class="col-9">
 <nav class='headerss' aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'category' category.id  %}">{{category}}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'category' topic.CategoryId.id  %}">{{topic.CategoryId.name}}</a></li>
         <li class="breadcrumb-item active" aria-current="page" href="#">{{topic.name}}</li>
     </ol>
 </nav>
-
-
-
+</div>
+    <div class="col-3 bg-info">
+        <h6 class="text-danger">Рейтинг:{{topic.AveregeRaiting}}</h6>
+{% if not user.is_authenticated %}
+    <h4 class="headerss"><a href="{% url 'account_login' %}">Чтобы оставить комментарий авторизуйтесь!</a></h4>
+{% endif %}
+        {{error_rait}}
+        {% if rait == True %}
+    <form method="post">
+        {% csrf_token %}
+        {{rating_form}}
+           <button type="submit" class="btn btn-primary btn-sm">Голосовать</button>
+    </form>
+        {% else %}
+        <h6 class="text-light">Спасибо за ваш голос!</h6>
+        {%endif%}
+        </div>
+    </div>
+<br/>
 <table class="table table-hover table-striped table-bordered headerss">
     <thead class="table-secondary">
     <tr>
@@ -36,7 +54,7 @@
     </tr>
 
 
-
+            <script src="/static/js/logic.js"></script>
     {% for comment in topic.messagees.all %}
     <tr>
         <td class="col-2 small">
@@ -57,10 +75,18 @@
             <br>
             {% endif %}
             <p class="small">{{comment.CommentText}}</p>
+
             <hr>
+
             <p class="small">{{comment.DateOfComment}}</p>
 
-            <!-- Модальное окно -->
+                            <span>{{comment.CommentLike}}:</span>
+                            <input onclick="alerted();" class="like" type="image" src="\static\img\like.png" width="2%"/>
+                            <span>{{comment.CommentDislike}}:</span>
+                             <input onclick="alerted();" class='dislike' type="image" src="\static\img\dislike.png"  width="2%"/>
+
+                            <br/>
+            {% if user.is_authenticated %}
                             <form class="px-4 py-3" method="post" height="20px">
                                 {% csrf_token %}
                                 <div class="card-footer py-3 border-0" style="background-color: #f8f9fa;" height="20px">
@@ -70,12 +96,14 @@
                                         </div>
                                     </div>
                                     <div class="float-end mt-2 pt-1" height="20px">
+                                         <input type="hidden" name="form" value="comment">
                                         <input type="hidden" name="parent_id" value="{{ comment.pk }}">
                                         <button type="submit" class="btn btn-primary btn-sm">Оставить комментарий
                                         </button>
                                     </div>
                                 </div>
                             </form>
+            {% endif %}
                         </div>
         </td>
     </tr>
@@ -97,10 +125,13 @@
             </div>
         </div>
         <div class="float-end mt-2 pt-1">
+            <input type="hidden" name="form" value="comment"/>
             <button type="submit" class="btn btn-primary btn-sm">Оставить комментарий</button>
         </div>
     </div>
 </form>
+{% else %}
+<h4 class="headerss"><a href="{% url 'account_login' %}">Чтобы оставить комментарий авторизуйтесь!</a></h4>
 {% endif %}
-
+            <script src="/static/js/logic.js"></script>
 {% endblock content %}

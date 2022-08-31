@@ -23,6 +23,9 @@ class Category(models.Model):
 class Forum(models.Model):
     name = models.CharField(max_length=200, verbose_name='Форум', null=False)
 
+    def __str__(self):
+        return self.name
+
 
 class Topic(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -40,42 +43,46 @@ class Topic(models.Model):
     DateOfCreation = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     Description = models.TextField(verbose_name='Описание', null=True)
     status = models.CharField(max_length=20, choices=choice, null=False, default=1)
-
+    AveregeRaiting = models.DecimalField(max_digits=3, decimal_places=2, verbose_name='Средний рейтинг', default=0)
 
     class Meta:
         ordering = ['DateOfCreation']
 
-
     def __str__(self):
         return f'{self.name} - {self.Creator} - {self.DateOfCreation}'
 
-
     def get_absolute_url(self):
-        return reverse('category', kwargs={'pl': self.pk, })
+        return reverse('category', kwargs={'id': self.id, })
 
 
 class TopicRaiting(models.Model):
     choice = [
-        ('Nice', 5),
-        ('Good', 4),
-        ('Middling', 3),
-        ('Bad', 2),
-        ('Terrible', 1),
+        (5, 'Отлично'),
+        (4, 'Хорошо'),
+        (3, 'Пойдет'),
+        (2, 'Плохо'),
+        (1, 'Лучше не видеть!'),
     ]
-    Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False)
-    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False)
-    Grade = models.PositiveSmallIntegerField(choices=choice, null=False)
+    Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False,related_name='rait')
+    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False,related_name='raituser')
+    Grade = models.PositiveSmallIntegerField(choices=choice, null=False, verbose_name='Оценка обсуждению')
+
+    def save(self, *args, **kwargs):
+        from forumBase.logic import average_rating_topic
+        super().save(*args, **kwargs)
+        average_rating_topic(self.Topic)
 
 
 class TopicSubscribe(models.Model):
     Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False)
-    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False,related_name='topics')
+    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False, related_name='topics')
 
 
 class CommentTopic(models.Model):
     Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False, verbose_name='Тема',
                               related_name='messagees')
-    User = models.ForeignKey(get_user_model(), on_delete=models.SET_DEFAULT, default='profile delete',related_name='comments')
+    User = models.ForeignKey(get_user_model(), on_delete=models.SET_DEFAULT, default='profile delete',
+                             related_name='comments')
     CommentText = models.TextField(verbose_name='Комментарий')
     CommentFather = models.ForeignKey('CommentTopic', on_delete=models.CASCADE, null=True, blank=True)
     DateOfComment = models.DateTimeField(auto_now_add=True)
@@ -87,9 +94,3 @@ class CommentTopic(models.Model):
 
     def __str__(self):
         return f'{self.CommentText}'
-
-    def getcountlike(self):
-        return self.CommentLike
-
-    def getcountdislike(self):
-        return self.CommentDislike

@@ -3,17 +3,20 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.admin import register
 
-from forumBase.models import Category, Topic, CommentTopic, Forum
+from forumBase.models import Category, Topic, CommentTopic, Forum, TopicRaiting
 
 
-@register(Category)
-class CategoryModel(admin.ModelAdmin):
-    pass
+class CategoryInLine(admin.TabularInline):
+    model = Category
+
+
+class TopicRaiting(admin.TabularInline):
+    model = TopicRaiting
 
 
 @register(Topic)
 class TopicModel(admin.ModelAdmin):
-    pass
+    inlines = [TopicRaiting]
 
 
 @register(CommentTopic)
@@ -23,4 +26,4 @@ class CommentModel(admin.ModelAdmin):
 
 @register(Forum)
 class ForumAdmin(admin.ModelAdmin):
-    pass
+    inlines = [CategoryInLine]
