@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Max, Subquery
 from django.shortcuts import render, redirect
 import datetime
@@ -45,6 +47,7 @@ class TopicDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super(TopicDetail, self).get_context_data(**kwargs)
         context['category'] = Category.objects.get(pk=self.kwargs['group'])
+        context['user'] = self.request.user
         if self.request.user.is_authenticated:
             context['comment_form'] = ModelComment(instance=self.request.user)
         return context
@@ -77,7 +80,7 @@ class TopicDetail(DetailView):
             return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
-class CreateTopicView(CreateView):
+class CreateTopicView(LoginRequiredMixin,CreateView):
     model = Topic
     template_name = 'pages/create_topic.html'
     fields = ['name', 'Description']
