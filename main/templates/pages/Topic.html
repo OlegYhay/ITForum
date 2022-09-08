@@ -41,7 +41,9 @@
     <tr>
         <td class="col-2 small">
             <a href="{% url 'user_profile' topic.Creator.username %}">{{topic.Creator.username}}</a><br/>
+            {% if topic.Creator.img %}
             <img src="{{topic.Creator.img.url}}" width="40%" min-width="50px" ,min-height="50px"/>
+            {% endif %}
             <p class="small2">{{topic.Creator.registration_date|date:'Y-m-d'}}</p>
             <p class="small2">Вопросов:{{topic.Creator.user_topics.count}}</p>
         </td>
