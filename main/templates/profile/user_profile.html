@@ -20,17 +20,24 @@
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center text-center">
-                    <img src="{{user.img.url}}" alt="Admin" class="rounded-circle" width="150">
+                    <img src="{{user_view.img.url}}" alt="Admin" class="rounded-circle" width="150">
                     <div class="mt-3">
-                      <h4>{{user.username}}</h4>
+                      <h4>{{user_view.username}}</h4>
                       <p class="text-secondary mb-1">Пользователь</p>
-                      <p class="text-muted font-size-sm">{{user.email}}</p>
-                        {% if isfrined == False %}
-                        <button class="btn btn-primary">Добавить в друзья</button>
-                        {% else %}
+                      <p class="text-muted font-size-sm">{{user_view.email}}</p>
+                        {% if isfrined == 'Нет' %}
+                        <form method="POST" action="{% url 'add_friends' user_view %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Добавить в друзья</button>
+                             <button class="btn btn-outline-primary">Написать сообщение</button>
+                        </form>
+                        {% elif isfrined == 'Да'  %}
                         <button class="btn btn-primary" disabled data-bs-toggle="button">Ваш друг</button>
+                         <button class="btn btn-outline-primary">Написать сообщение</button>
+                        {% elif isfrined == 'заявка'%}
+                            <button class="btn btn-secondary" disabled data-bs-toggle="button">Заявка отправлена</button>
+                            <button class="btn btn-outline-primary">Написать сообщение</button>
                         {% endif %}
-                      <button class="btn btn-outline-primary">Написать сообщение</button>
                     </div>
                   </div>
                 </div>
@@ -81,7 +88,7 @@
              <div class="container-fluid">
                   <div class="row">
                         {% for user1 in friends_custom %}
-                      {% if user1.friend == user %}
+                      {% if user1.friend == user_view %}
                           <div class="col">
                             <img src="{{user1.user.img.url}}" alt="Admin" class="rounded-circle" width="100px">
                             <div class="mt-3">
@@ -98,16 +105,8 @@
                       </div>
                       {% endif %}
                       {% endfor %}
+                   </div>
                   </div>
-              </div>
-
-
-
-
-
-
-
-
                 </div>
             </div>
         </div>

@@ -12,7 +12,7 @@ from user.models import CustomUser, FriendRequest
 class UserDetailView(UpdateView):
     model = CustomUser
     template_name = 'profile/profile_settings.html'
-    fields = ['username', 'first_name', 'last_name', 'img']
+    fields = ['username', 'first_name', 'last_name', 'CanMessageOnlyFriends', 'img']
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.username != kwargs['username']:
@@ -30,7 +30,7 @@ class UserDetailView(UpdateView):
 class UserProfileView(DetailView):
     model = CustomUser
     template_name = 'profile/user_profile.html'
-    context_object_name = 'user'
+    context_object_name = 'user_view'
 
     def get_object(self, queryset=None):
         objectUser = get_user_model().objects.get(username=self.kwargs['username'])
@@ -38,23 +38,26 @@ class UserProfileView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserProfileView, self).get_context_data(**kwargs)
-        user = self.get_object()
-        query1 = user.friends.all()
-        query2 = user.users_friends.all()
-        if self.request.user == user or len(self.get_object().users_friends.filter(user=self.request.user,friend=user)) != 0:
-            isfriend = True
+        user1 = self.get_object()
+        query1 = user1.friends.all()
+        query2 = user1.users_friends.all()
+        if self.request.user == user1 or len(
+                self.get_object().users_friends.filter(user=self.request.user, friend=user1)) != 0:
+            isfriend = 'Да'
         else:
-            isfriend = False
+            isfriend = 'Нет'
+        if len(self.request.user.from_user.filter(request_from=self.request.user, request_to=self.get_object())) != 0:
+            isfriend = 'заявка'
         context['isfrined'] = isfriend
         context['friends_custom'] = query1.union(query2)
         return context
 
 
-def add_friends(request):
+def add_friends(request, user_to):
     if request.method == 'POST':
         new_request = FriendRequest(
             request_from=request.user,
-            request_to=request.kwargs['user_to'],
+            request_to=CustomUser.objects.get(email=user_to),
             status=False,
         )
         new_request.save()

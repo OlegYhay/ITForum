@@ -18,6 +18,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserModel()
+    CanMessageOnlyFriends = models.BooleanField(default=False, verbose_name='Сообщения могут писать только друзья')
 
     def __str__(self):
         return self.email
