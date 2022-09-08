@@ -40,7 +40,7 @@
     <tbody class="table-striped">
     <tr>
         <td class="col-2 small">
-            <a href="#">{{topic.Creator.username}}</a><br/>
+            <a href="{% url 'user_profile' topic.Creator.username %}">{{topic.Creator.username}}</a><br/>
             <img src="{{topic.Creator.img.url}}" width="40%" min-width="50px" ,min-height="50px"/>
             <p class="small2">{{topic.Creator.registration_date|date:'Y-m-d'}}</p>
             <p class="small2">Вопросов:{{topic.Creator.user_topics.count}}</p>
@@ -58,7 +58,7 @@
     {% for comment in topic.messagees.all %}
     <tr>
         <td class="col-2 small">
-            <a href="#">{{comment.User.username}}</a><br/>
+            <a href="{% url 'user_profile' comment.User.username %}">{{comment.User.username}}</a><br/>
             {% if comment.User.img  %}
                 <img src="{{comment.User.img.url}}" width="40%" min-width="50px" ,min-height="50px"/>
             {% endif %}
@@ -79,13 +79,17 @@
             <hr>
 
             <p class="small">{{comment.DateOfComment}}</p>
-
-                            <span>{{comment.CommentLike}}:</span>
-                            <input onclick="alerted();" class="like" type="image" src="\static\img\like.png" width="2%"/>
-                            <span>{{comment.CommentDislike}}:</span>
-                             <input onclick="alerted();" class='dislike' type="image" src="\static\img\dislike.png"  width="2%"/>
-
-                            <br/>
+                             <form method="post" action="{% url 'like_set' comment.pk %}">
+                                    {% csrf_token %}
+                                    <span>{{comment.CommentLike}}:</span>
+                                    <input  class="like" type="image" src="\static\img\like.png" width="2%" name="like"/>
+                             </form>
+                                 <form method="post" action="{% url 'dislike_set' comment.id %}">
+                                     {% csrf_token %}
+                                    <span>{{comment.CommentDislike}}:</span>
+                                     <input class='dislike' type="image" src="\static\img\dislike.png"  width="2%" name ='dislike'/>
+                                 </form>
+                                     <br/>
             {% if user.is_authenticated %}
                             <form class="px-4 py-3" method="post" height="20px">
                                 {% csrf_token %}

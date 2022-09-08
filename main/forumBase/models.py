@@ -63,8 +63,8 @@ class TopicRaiting(models.Model):
         (2, 'Плохо'),
         (1, 'Лучше не видеть!'),
     ]
-    Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False,related_name='rait')
-    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False,related_name='raituser')
+    Topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=False, related_name='rait')
+    User = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=False, related_name='raituser')
     Grade = models.PositiveSmallIntegerField(choices=choice, null=False, verbose_name='Оценка обсуждению')
 
     def save(self, *args, **kwargs):
@@ -86,11 +86,27 @@ class CommentTopic(models.Model):
     CommentText = models.TextField(verbose_name='Комментарий')
     CommentFather = models.ForeignKey('CommentTopic', on_delete=models.CASCADE, null=True, blank=True)
     DateOfComment = models.DateTimeField(auto_now_add=True)
-    CommentLike = models.PositiveIntegerField(default=0)
-    CommentDislike = models.PositiveIntegerField(default=0)
+    CommentLike = models.IntegerField(default=0)
+    CommentDislike = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['DateOfComment']
 
     def __str__(self):
         return f'{self.CommentText}'
+
+
+class CommentLikes(models.Model):
+    comment_id = models.ForeignKey('CommentTopic', on_delete=models.CASCADE, related_name='comment_likes')
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='users_likes')
+
+    def __str__(self):
+        return f'{self.user_id}_{self.comment_id}'
+
+
+class CommentDislikes(models.Model):
+    comment_id = models.ForeignKey('CommentTopic', on_delete=models.CASCADE, related_name='comment_dislikes')
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='users_dislikes')
+
+    def __str__(self):
+        return f'{self.user_id}_{self.comment_id}'

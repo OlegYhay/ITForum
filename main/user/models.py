@@ -13,18 +13,28 @@ if TYPE_CHECKING:
 
 class CustomUser(AbstractUser):
     email = models.EmailField(verbose_name='email address', unique=True)
-    img = models.ImageField(upload_to='userImg/',verbose_name='Аватарка')
+    img = models.ImageField(upload_to='userImg/', verbose_name='Аватарка')
     registration_date = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserModel()
-    friends = models.ManyToManyField('self', blank=True)
 
     def __str__(self):
         return self.email
 
     def count_message(self):
         return CommentTopic.objects.filter(User=self.pk).count()
+
+
+class Friends_user(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='friends')
+    friend = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='users_friends')
+
+
+class FriendRequest(models.Model):
+    request_from = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='from_user')
+    request_to = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='to_user')
+    status = models.BooleanField(verbose_name='Заявка принята', default=False)
 
 
 class UserChat(models.Model):

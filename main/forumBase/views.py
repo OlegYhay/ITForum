@@ -9,7 +9,8 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 
 from forumBase.forms import ModelComment, ModelRating, ModelLikeDislike
-from forumBase.models import Category, Forum, Topic, CommentTopic, TopicRaiting
+from forumBase.logic import likes_count, dislikes_count
+from forumBase.models import Category, Forum, Topic, CommentTopic, TopicRaiting, CommentLikes, CommentDislikes
 
 
 class Home(ListView):
@@ -50,7 +51,8 @@ class TopicDetail(DetailView):
         if self.request.user.is_authenticated:
             context['comment_form'] = ModelComment(instance=self.request.user)
             context['rating_form'] = ModelRating(instance=self.request.user)
-            context['like_form'] = ModelLikeDislike(instance=self.request.user)
+            # don't use
+            # context['like_form'] = ModelLikeDislike(instance=self.request.user)
             rait = TopicRaiting.objects.filter(User=self.request.user, Topic=self.get_object())
             if rait.count() == 0:
                 context['rait'] = True
@@ -115,3 +117,33 @@ class CreateTopicView(LoginRequiredMixin, CreateView):
 
 class RulesTempalateView(TemplateView):
     template_name = 'pages/SiteRules.html'
+
+
+def like_set(request, pk):
+    if request.method == 'POST':
+        try:
+            likes = CommentLikes.objects.get(comment_id=pk, user_id=request.user)
+            likes.delete()
+        except:
+            likes = CommentLikes.objects.create(
+                comment_id=CommentTopic.objects.get(pk=pk),
+                user_id=request.user,
+            )
+            likes.save()
+        likes_count(likes.comment_id)
+    return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
+def dislike_set(request, pk):
+    if request.method == 'POST':
+        try:
+            dislikes = CommentDislikes.objects.get(comment_id=pk, user_id=request.user)
+            dislikes.delete()
+        except:
+            dislikes = CommentDislikes.objects.create(
+                comment_id=CommentTopic.objects.get(pk=pk),
+                user_id=request.user,
+            )
+            dislikes.save()
+        dislikes_count(dislikes.comment_id)
+    return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
