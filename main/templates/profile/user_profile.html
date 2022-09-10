@@ -34,9 +34,12 @@
                         {% elif isfrined == 'Да'  %}
                         <button class="btn btn-primary" disabled data-bs-toggle="button">Ваш друг</button>
                          <button class="btn btn-outline-primary">Написать сообщение</button>
-                        {% elif isfrined == 'заявка'%}
+                        {% elif isfrined == 'заявка' %}
                             <button class="btn btn-secondary" disabled data-bs-toggle="button">Заявка отправлена</button>
                             <button class="btn btn-outline-primary">Написать сообщение</button>
+                        {% elif isfrined == 'принять' %}
+                        <button class="btn btn-secondary" disabled data-bs-toggle="button">Вам отправлена заявка от этого пользователя</button>
+                        <button class="btn btn-outline-primary">Написать сообщение</button>
                         {% endif %}
                     </div>
                   </div>
