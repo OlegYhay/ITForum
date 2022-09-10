@@ -5,7 +5,7 @@ from django.db.models import Count, Max, Subquery
 from django.shortcuts import render, redirect
 import datetime
 # Create your views here.
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, NoReverseMatch
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 
 from forumBase.forms import ModelComment, ModelRating, ModelLikeDislike
@@ -131,8 +131,7 @@ def like_set(request, pk):
             )
             likes.save()
         likes_count(likes.comment_id)
-    return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
-
+        return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 def dislike_set(request, pk):
     if request.method == 'POST':
