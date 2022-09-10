@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <h2>Регистрация</h2>
-<form method="post">
+<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
     {{ form|crispy }}
     <button type="submit" class="btn btn-dark">Регистрация</button>

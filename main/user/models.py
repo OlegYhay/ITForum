@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class CustomUser(AbstractUser):
     email = models.EmailField(verbose_name='email address', unique=True)
     img = models.ImageField(upload_to='userImg/', verbose_name='Аватарка')
-    registration_date = models.DateTimeField(auto_now=True)
+    registration_date = models.DateTimeField(auto_now_add=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserModel()

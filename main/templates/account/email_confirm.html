@@ -1,0 +1,11 @@
+{% extends 'pages/_base.html' %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+<form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="headerss" type="submit">Подтвердить почту</button>
+</form>
+
+{% endblock content %}

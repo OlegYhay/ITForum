@@ -33,6 +33,7 @@
                         </form>
                         {% elif isfrined == 'Да'  %}
                         <button class="btn btn-primary" disabled data-bs-toggle="button">Ваш друг</button>
+                        <button class="btn btn-outline-primary btn-danger text-light">Удалить из друзей</button>
                          <button class="btn btn-outline-primary">Написать сообщение</button>
                         {% elif isfrined == 'заявка' %}
                             <button class="btn btn-secondary" disabled data-bs-toggle="button">Заявка отправлена</button>
@@ -93,15 +94,20 @@
                         {% for user1 in friends_custom %}
                       {% if user1.friend == user_view %}
                           <div class="col">
+                              {% if user1.user.img %}
                             <img src="{{user1.user.img.url}}" alt="Admin" class="rounded-circle" width="100px">
+                               {% endif %}
                             <div class="mt-3">
                                 <h6><a href="{% url 'user_profile' user1.user.username %}">{{user1.user.username}}</a></h6>
                             </div>
+
                       </div>
 
                       {% else %}
                       <div class="col">
+                          {% if user1.friend.img %}
                             <img src="{{user1.friend.img.url}}" alt="Admin" class="rounded-circle" width="100px">
+                           {% endif %}
                             <div class="mt-3">
                                 <h6><a href="{% url 'user_profile' user1.friend.username %}">{{user1.friend.username}}</a></h6>
                             </div>

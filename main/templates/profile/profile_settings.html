@@ -2,17 +2,106 @@
 {% block title %}Настройки профиля{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h2 class="headerss">Настройки профиля</h2>
-<form method="post" class="headerss">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <br/>
-    <a href="{% url 'account_change_password' %}" class="btn btn-secondary">Сменить пароль</a>
-        <a href="{% url 'account_email' %}" class="btn btn-secondary">Изменить email</a>
-        <br/>
-    <br/>
-    <button type="submit" class="btn btn-dark">Сохранить</button>
-    <button type="button" class="btn btn-dark text-light"><a class="text-light"  style="text-decoration: none; " href="{% url 'home' %}">Отмена</a></button>
-</form>
+<div class="container">
+    <div class="main-body">
+
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+              <li class="breadcrumb-item"><a href="javascript:void(0)">User</a></li>
+              <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+            </ol>
+          </nav>
+          <!-- /Breadcrumb -->
+
+          <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <img src="{{user_view.img.url}}" alt="Admin" class="rounded-circle" width="150">
+                    <div class="mt-3">
+                      <h4>{{user_view.username}}</h4>
+                      <p class="text-secondary mb-1">Пользователь</p>
+                      <p class="text-muted font-size-sm">{{user_view.email}}</p>
+                        {% if isfrined == 'Нет' %}
+                        <form method="POST" action="{% url 'add_friends' user_view %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Добавить в друзья</button>
+                             <button class="btn btn-outline-primary">Написать сообщение</button>
+                        </form>
+                        {% elif isfrined == 'Да'  %}
+                        <button class="btn btn-primary" disabled data-bs-toggle="button">Ваш друг</button>
+                         <button class="btn btn-outline-primary">Написать сообщение</button>
+                        {% elif isfrined == 'заявка' %}
+                            <button class="btn btn-secondary" disabled data-bs-toggle="button">Заявка отправлена</button>
+                            <button class="btn btn-outline-primary">Написать сообщение</button>
+                        {% elif isfrined == 'принять' %}
+                        <button class="btn btn-secondary" disabled data-bs-toggle="button">Вам отправлена заявка от этого пользователя</button>
+                        <button class="btn btn-outline-primary">Написать сообщение</button>
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card mt-3">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                    <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe mr-2 icon-inline"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>Website</h6>
+                    <span class="text-secondary">http://Mysite{{request.path}}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-8">
+
+
+              <h2 class="headerss">Настройки профиля</h2>
+                <form  class="headerss" enctype='multipart/form-data' method="POST">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <br/>
+                    <a href="{% url 'account_change_password' %}" class="btn btn-secondary">Сменить пароль</a>
+                        <a href="{% url 'account_email' %}" class="btn btn-secondary">Изменить email</a>
+                        <br/>
+                    <br/>
+                    <button type="submit" class="btn btn-dark">Сохранить</button>
+                    <button type="button" class="btn btn-dark text-light"><a class="text-light"  style="text-decoration: none; " href="{% url 'home' %}">Отмена</a></button>
+                </form>
+
+                <b>Список друзей</b>
+             <div class="container-fluid">
+                  <div class="row">
+                        {% for user1 in friends_custom %}
+                      {% if user1.friend == user_view %}
+                          <div class="col">
+                              {% if user1.user.img %}
+                            <img src="{{user1.user.img.url}}" alt="Admin" class="rounded-circle" width="100px">
+                               {% endif %}
+                            <div class="mt-3">
+                                <h6><a href="{% url 'user_profile' user1.user.username %}">{{user1.user.username}}</a></h6>
+                            </div>
+
+                      </div>
+
+                      {% else %}
+                      <div class="col">
+                          {% if user1.friend.img %}
+                            <img src="{{user1.friend.img.url}}" alt="Admin" class="rounded-circle" width="100px">
+                           {% endif %}
+                            <div class="mt-3">
+                                <h6><a href="{% url 'user_profile' user1.friend.username %}">{{user1.friend.username}}</a></h6>
+                            </div>
+                      </div>
+                      {% endif %}
+                      {% endfor %}
+                   </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock content %}

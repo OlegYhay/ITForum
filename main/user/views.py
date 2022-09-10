@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, UpdateView, ListView, DeleteView
 
 from user.models import CustomUser, FriendRequest, Friends_user
@@ -15,6 +15,7 @@ class UserDetailView(UpdateView):
     model = CustomUser
     template_name = 'profile/profile_settings.html'
     fields = ['username', 'first_name', 'last_name', 'CanMessageOnlyFriends', 'img']
+    context_object_name = 'user_view'
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.username != kwargs['username']:
@@ -25,6 +26,14 @@ class UserDetailView(UpdateView):
         _object = CustomUser.objects.get(username=self.kwargs['username'])
         return _object
 
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        user1 = self.get_object()
+        query1 = user1.friends.all()
+        query2 = user1.users_friends.all()
+        context['friends_custom'] = query1.union(query2)
+        return context
+
     def get_success_url(self):
         return reverse_lazy('profile', kwargs={'username': self.request.user.username})
 
@@ -33,6 +42,13 @@ class UserProfileView(DetailView):
     model = CustomUser
     template_name = 'profile/user_profile.html'
     context_object_name = 'user_view'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object() == self.request.user:
+            return redirect(reverse('profile', kwargs={'username': self.request.user.username}))
+        if self.request.user.is_anonymous:
+            return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+        return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         objectUser = get_user_model().objects.get(username=self.kwargs['username'])
